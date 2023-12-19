@@ -1,0 +1,32 @@
+.white {
+    background-color: white;
+    height: 4rem;
+    width: 4rem;
+
+}
+
+.black {
+    background-color: black;
+    height: 4rem;
+    width: 4rem;
+
+}
+
+html, body {margin: 2rem; height: 90%; overflow: hidden}
+
+.chessboard {
+    align-self: center;
+    height: 30rem;
+    width: 55rem;
+    border-collapse: collapse;
+    border: 2px solid black;
+}
+
+.chessboard td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+
+
+

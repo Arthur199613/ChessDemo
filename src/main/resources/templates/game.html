@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chessboard</title>
+    <link rel="stylesheet" type="text/css" media="all" href="/style.css" th:href="@{/style.css}" />
+</head>
+<body>
+<table class="chessboard">
+    <tbody>
+    <tr th:each="row, rowIdx : ${game.getSquares()}">
+        <th th:text="${8 - rowIdx.index}" class="index"></th>
+        <td th:each="square, colIdx : ${row}" th:class="${(rowIdx.index + colIdx.index) % 2 == 0 ? 'black' : 'white'}"></td>
+    <tr>
+        <th></th>
+        <th th:text="'a'"></th>
+        <th th:text="'b'"></th>
+        <th th:text="'c'"></th>
+        <th th:text="'d'"></th>
+        <th th:text="'e'"></th>
+        <th th:text="'f'"></th>
+        <th th:text="'g'"></th>
+        <th th:text="'h'"></th>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
