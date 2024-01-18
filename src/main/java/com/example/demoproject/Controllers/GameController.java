@@ -1,10 +1,14 @@
 package com.example.demoproject.Controllers;
 
+import com.example.demoproject.DTO.MoveRequest;
 import com.example.demoproject.Logic.Game;
 import com.example.demoproject.Service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -23,6 +27,12 @@ public class GameController {
         Game game =gameService.initializeGame(); // Retrieve game data (from service, etc.)
                 model.addAttribute("game", game.getChessboard());
         return "game"; // Return the name of the Thymeleaf template (game1.html)
+    }
+
+    //ToDo Validate Move Function
+    @PostMapping("/makeMove")
+    public ResponseEntity<Boolean> makeMove(@RequestBody MoveRequest moveRequest){
+        boolean isValidMove = validateMove(moveRequest);
     }
 
     // Other controller methods

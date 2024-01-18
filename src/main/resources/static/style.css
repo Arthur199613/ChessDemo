@@ -5,11 +5,15 @@
 
 }
 
-.black {
-    background-color: black;
+.brown {
+    background-color: saddlebrown;
     height: 4rem;
     width: 4rem;
 
+}
+.chessboard td img{
+    width: 50%;
+    height: 50%;
 }
 
 html, body {margin: 2rem; height: 90%; overflow: hidden}

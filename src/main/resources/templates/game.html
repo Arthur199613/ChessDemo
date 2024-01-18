@@ -10,7 +10,18 @@
     <tbody>
     <tr th:each="row, rowIdx : ${game.getSquares()}">
         <th th:text="${8 - rowIdx.index}" class="index"></th>
-        <td th:each="square, colIdx : ${row}" th:class="${(rowIdx.index + colIdx.index) % 2 == 0 ? 'black' : 'white'}"></td>
+        <td th:each="square, colIdx : ${row}" th:class="${(rowIdx.index + colIdx.index) % 2 == 0 ? 'chessboard-square brown' : 'chessboard-square white'} "
+            th:id="'square_'+${rowIdx.index}+'_'+${colIdx.index}">
+
+            <div th:if="${game.getSquares()[rowIdx.index][colIdx.index] != null}" class="chess-piece" th:id="'piece_'+${rowIdx.index}+'_'+${colIdx.index}"
+                 th:data-piece-type="${game.getSquares()[rowIdx.index][colIdx.index].getPieceType()}"
+                 th:data-piece-colour="${game.getSquares()[rowIdx.index][colIdx.index].getColour().toString()}">
+                <!-- Use appropriate Thymeleaf expressions to generate the piece image source, alt text, etc. -->
+
+                <img class="draggable" draggable="true" th:src="@{../static/ChessPieces/pawn-w.svg}" th:alt="null">
+            </div>
+        </td>
+    </tr>
     <tr>
         <th></th>
         <th th:text="'a'"></th>
@@ -25,4 +36,89 @@
     </tbody>
 </table>
 </body>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        // Add drag-and-drop functionality only to img elements with class 'draggable'
+        const draggableImages = document.querySelectorAll('.draggable');
+        draggableImages.forEach(img => {
+            img.addEventListener('dragstart', handleDragStart);
+            img.addEventListener('dragend', handleDragEnd);
+        });
+
+        // Add drop zones for chessboard squares
+        const chessboardSquares = document.querySelectorAll('.chessboard-square');
+        chessboardSquares.forEach(square => {
+            square.addEventListener('dragover', handleDragOver);
+            square.addEventListener('drop', handleDrop);
+        });
+
+        function handleDragStart(event) {
+            event.dataTransfer.setData('text/plain', event.target.parentElement.id);
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            const pieceId = event.dataTransfer.getData('text/plain');
+            const fromSquare = document.getElementById(pieceId);
+            const toSquare = event.target;
+
+            const draggedPiece = document.getElementById(pieceId);
+            const pieceType = draggedPiece.getAttribute('data-piece-type');
+            const pieceColor = draggedPiece.getAttribute('data-piece-colour');
+
+            console.log('Piece ID:', pieceId);
+            console.log('Dragged Piece:', draggedPiece);
+            console.log(pieceType);
+
+
+            console.log(`The piece is a ${pieceType} and is  ${pieceColor} and it is at ${draggedPiece} going to
+            ${toSquare}`);
+            makeMoveRequest(fromSquare,toSquare,pieceType,pieceColor)
+
+            // Ensure the drop target is a valid chessboard square
+            if (toSquare.classList.contains('chessboard-square')) {
+                // Move the piece to the new square
+                toSquare.appendChild(fromSquare);
+            } else {
+                // Handle the case when the drop target is not a valid square
+                console.error('Invalid drop target:', toSquare);
+            }
+        }
+
+        function makeMoveRequest(fromSquare,toSquare,pieceType,pieceColour){
+            fetch('/makeMove',{
+                method:'POST',
+                headers:{
+                    'Content-type':'application-json',
+                },
+                body: JSON.stringify({
+                    fromSquare:fromSquare,
+                    toSquare:toSquare,
+                    pieceType:pieceType,
+                    pieceColour:pieceColour,
+                }),
+            })
+                .then(response => response.json())
+                .then(isValidMove =>{
+                    if(isValidMove){
+                        //update the UI
+                        console.log('Move is valid!')
+                    } else{
+                        console.log("Invalid Move!")
+                    }
+                })
+                .catch(error => {
+                    console.log("Error making move",error);
+                })
+        }
+
+        function handleDragEnd(event) {
+            // Additional logic after dragging ends (if needed)
+        }
+    });
+</script>
 </html>
