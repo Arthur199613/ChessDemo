@@ -1,20 +1,34 @@
 package com.example.demoproject.DTO;
 
-import com.example.demoproject.Model.Colour;
-import com.example.demoproject.Model.PieceType;
-
 public class MoveRequest {
     private String fromSquare;
     private String toSquare;
-    private PieceType pieceType;
-    private Colour pieceColor;
+    private String pieceType;
+    private String pieceColor;
 
-    public MoveRequest(String fromSquare, String toSquare, PieceType pieceType, Colour pieceColor) {
+    public MoveRequest(String fromSquare, String toSquare, String pieceType, String pieceColor) {
         this.fromSquare = fromSquare;
         this.toSquare = toSquare;
         this.pieceType = pieceType;
         this.pieceColor = pieceColor;
     }
+
+    public String getPieceColor() {
+        return pieceColor;
+    }
+
+    public String getPieceType() {
+        return pieceType;
+    }
+
+    public String getFromSquare() {
+        return fromSquare;
+    }
+
+    public String getToSquare() {
+        return toSquare;
+    }
+
 
     // Getters and setters
 }

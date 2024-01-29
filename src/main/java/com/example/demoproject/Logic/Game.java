@@ -1,6 +1,7 @@
 package com.example.demoproject.Logic;
 
 
+import com.example.demoproject.DTO.MoveRequest;
 import com.example.demoproject.Model.*;
 
 public class Game {
@@ -12,6 +13,12 @@ public class Game {
     }
 
     private void setSquareColourAndChessboard(Piece[][] squares) {
+
+    }
+
+    public boolean validateMove(MoveRequest moveRequest){
+
+        return chessboard.validateMove(moveRequest);
 
     }
 

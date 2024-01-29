@@ -32,7 +32,16 @@ public class GameController {
     //ToDo Validate Move Function
     @PostMapping("/makeMove")
     public ResponseEntity<Boolean> makeMove(@RequestBody MoveRequest moveRequest){
-        boolean isValidMove = validateMove(moveRequest);
+        boolean isValidMove = gameService.gameServicevalidateMove(moveRequest);
+        if (isValidMove) {
+            // Update the game state if the move is valid
+            // You can also return additional information if needed
+            return ResponseEntity.ok(true);
+        } else {
+            // Return a response indicating the move is invalid
+            return ResponseEntity.ok(false);
+        }
+
     }
 
     // Other controller methods

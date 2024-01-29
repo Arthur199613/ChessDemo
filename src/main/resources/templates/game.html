@@ -13,12 +13,14 @@
         <td th:each="square, colIdx : ${row}" th:class="${(rowIdx.index + colIdx.index) % 2 == 0 ? 'chessboard-square brown' : 'chessboard-square white'} "
             th:id="'square_'+${rowIdx.index}+'_'+${colIdx.index}">
 
-            <div th:if="${game.getSquares()[rowIdx.index][colIdx.index] != null}" class="chess-piece" th:id="'piece_'+${rowIdx.index}+'_'+${colIdx.index}"
-                 th:data-piece-type="${game.getSquares()[rowIdx.index][colIdx.index].getPieceType()}"
-                 th:data-piece-colour="${game.getSquares()[rowIdx.index][colIdx.index].getColour().toString()}">
+            <div th:if="${game.getSquares()[rowIdx.index][colIdx.index] != null}" class="chess-piece" th:id="'piece_'+${rowIdx.index}+'_'+${colIdx.index}">
                 <!-- Use appropriate Thymeleaf expressions to generate the piece image source, alt text, etc. -->
 
-                <img class="draggable" draggable="true" th:src="@{../static/ChessPieces/pawn-w.svg}" th:alt="null">
+                <img class="draggable" draggable="true"
+                     th:src="@{../static/ChessPieces/pawn-w.svg}" th:alt="null"
+                     th:id="'piece_'+${rowIdx.index}+'_'+${colIdx.index}"
+                     th:data-piece-type="${game.getSquares()[rowIdx.index][colIdx.index].getPieceType()}"
+                     th:data-piece-colour="${game.getSquares()[rowIdx.index][colIdx.index].getColour().toString()}">
             </div>
         </td>
     </tr>
@@ -53,7 +55,8 @@
         });
 
         function handleDragStart(event) {
-            event.dataTransfer.setData('text/plain', event.target.parentElement.id);
+            event.dataTransfer.setData('text/plain', event.target.id);
+            console.log(event.target.id);
         }
 
         function handleDragOver(event) {
@@ -63,21 +66,26 @@
         function handleDrop(event) {
             event.preventDefault();
             const pieceId = event.dataTransfer.getData('text/plain');
-            const fromSquare = document.getElementById(pieceId);
-            const toSquare = event.target;
+            const fromSquare = event.dataTransfer.getData('text/plain') === 'piece_' + event.target.id ? event.target : document.getElementById(pieceId);
+            const toSquare = event.target.closest('td'); // Find the closest parent 'td' element
 
-            const draggedPiece = document.getElementById(pieceId);
+            const draggedPiece = document.getElementById(pieceId).querySelector('img'); // Get the img element
+
             const pieceType = draggedPiece.getAttribute('data-piece-type');
             const pieceColor = draggedPiece.getAttribute('data-piece-colour');
 
+            const [toRow, toCol] = toSquare.id.split('_').slice(1);
+
             console.log('Piece ID:', pieceId);
-            console.log('Dragged Piece:', draggedPiece);
-            console.log(pieceType);
+            console.log('Dragged Piece:', toSquare.id);
+            console.log('Piece Type:', pieceType);
+            console.log('Piece Color:', pieceColor);
+            console.log(`Dropped at row ${toRow}, column ${toCol}`);
 
 
-            console.log(`The piece is a ${pieceType} and is  ${pieceColor} and it is at ${draggedPiece} going to
-            ${toSquare}`);
-            makeMoveRequest(fromSquare,toSquare,pieceType,pieceColor)
+            console.log(`The piece is a ${pieceType} and is  ${pieceColor} and it is at ${pieceId} going to
+            ${toSquare.id}`);
+            makeMoveRequest(pieceId,toSquare.id,pieceType,pieceColor)
 
             // Ensure the drop target is a valid chessboard square
             if (toSquare.classList.contains('chessboard-square')) {
@@ -90,16 +98,19 @@
         }
 
         function makeMoveRequest(fromSquare,toSquare,pieceType,pieceColour){
+
+            //const fromCoordinates = fromSquare.id.replace('piece_', ''); // Extracting coordinates from the fromSquare id
+            //const toCoordinates = toSquare.id.replace('square_', ''); // Extracting coordinates from the toSquare id
             fetch('/makeMove',{
                 method:'POST',
                 headers:{
-                    'Content-type':'application-json',
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    fromSquare:fromSquare,
-                    toSquare:toSquare,
+                    fromSquare: fromSquare,
+                    toSquare: toSquare,
                     pieceType:pieceType,
-                    pieceColour:pieceColour,
+                    pieceColor:pieceColour,
                 }),
             })
                 .then(response => response.json())
