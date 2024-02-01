@@ -1,6 +1,7 @@
 package com.example.demoproject.Model;
 
 import com.example.demoproject.DTO.MoveRequest;
+import com.example.demoproject.Util.Position;
 import org.springframework.data.util.Pair;
 
 import java.util.Arrays;
@@ -13,6 +14,7 @@ public class Chessboard {
     public Chessboard(){
         squares = new Piece[8][8];
         //Pieces being set
+        //TODO remove this from the constructor, it is too confusing and unpredictable
         setPieces(squares);
         System.out.println(this);
     }
@@ -35,8 +37,6 @@ public class Chessboard {
         //TODO Confusing logic, can refactor this later
         isValid = piece[FromXY.getFirst()][FromXY.getSecond()].getPiece().isValidMove(this, ToXY.getFirst(), ToXY.getSecond()
                 ,FromXY.getFirst(),FromXY.getSecond() );
-
-
 
         return isValid;
     }
@@ -79,15 +79,30 @@ public class Chessboard {
     private void setPieces(Piece[][] squares){
         for(int i = 1; i < 2; i++){
             for(int j = 0; j < squares[i].length;j++){
+                squares[i][j] = new Pawn(Colour.BLACK,PieceType.PAWN);
+            }
+        }
+        squares[0][0] = new Rook(Colour.BLACK,PieceType.ROOK);
+        squares[0][7] = new Rook(Colour.BLACK,PieceType.ROOK);
+        squares[0][1] = new Knight(Colour.BLACK,PieceType.KNIGHT);
+        squares[0][6] = new Knight(Colour.BLACK,PieceType.KNIGHT);
+        squares[0][2] = new Bishop(Colour.BLACK,PieceType.BISHOP);
+        squares[0][5] = new Bishop(Colour.BLACK,PieceType.BISHOP);
+        squares[0][3] = new Queen(Colour.BLACK,PieceType.QUEEN);
+        squares[0][4] = new King(Colour.BLACK,PieceType.KING);
+
+        for(int i = squares.length -2; i < squares.length-1;i++){
+            for(int j = 0; j < squares[i].length; j++){
                 squares[i][j] = new Pawn(Colour.WHITE,PieceType.PAWN);
             }
         }
 
-        for(int i = squares.length -2; i < squares.length-1;i++){
-            for(int j = 0; j < squares[i].length; j++){
-                squares[i][j] = new Pawn(Colour.BLACK,PieceType.PAWN);
-            }
-        }
+
+    }
+
+    public boolean isInside(Position pos){
+        return pos.getX() < squares.length && pos.getY() < squares.length &&
+                pos.getX() >= 0 && pos.getY() >= 0;
     }
 
     public Piece[][] getSquares() {

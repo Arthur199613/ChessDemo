@@ -28,9 +28,11 @@ public class Pawn extends Piece{
 
     @Override
     public Boolean isValidMove(Chessboard chessboard, int toX, int toY, int fromX, int fromY) {
-        if (chessboard.getSquares()[toX][toY] != null && chessboard.getSquares()[toX][toY].getColour() == this.getColour()) {
+        if (chessboard.getSquares()[toX][toY] != null && chessboard.getSquares()[toX][toY].getColour().equals(this.getColour()) ) {
             return false;
         }
+
+
 
         if (this.isFirstMove) {
             if (this.getColour().equals(Colour.WHITE.toString()) && toX == fromX + 2) {
