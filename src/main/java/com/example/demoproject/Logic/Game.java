@@ -11,19 +11,11 @@ public class Game {
         //initialises pieces also
         chessboard = new Chessboard();
     }
-
     private void setSquareColourAndChessboard(Piece[][] squares) {
-
     }
-
-    public boolean validateMove(MoveRequest moveRequest){
-
-        return chessboard.validateMove(moveRequest);
-
+    public boolean makeMove(int fromX, int fromY,int toX,int toY){
+        return chessboard.makeMove(fromX,fromY,toX,toY);
     }
-
-
-
 
     public Chessboard getChessboard() {
         return this.chessboard;

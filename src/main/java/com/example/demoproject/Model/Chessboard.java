@@ -1,6 +1,8 @@
 package com.example.demoproject.Model;
 
 import com.example.demoproject.DTO.MoveRequest;
+import com.example.demoproject.Model.Move.Move;
+import com.example.demoproject.Model.Move.NormalMove;
 import com.example.demoproject.Util.Position;
 import org.springframework.data.util.Pair;
 
@@ -8,7 +10,7 @@ import java.util.Arrays;
 
 public class Chessboard {
     //Square[][] squares;
-    Piece[][] squares;
+    private Piece[][] squares;
 
 
     public Chessboard(){
@@ -17,6 +19,13 @@ public class Chessboard {
         //TODO remove this from the constructor, it is too confusing and unpredictable
         setPieces(squares);
         System.out.println(this);
+    }
+
+    public boolean makeMove(int fromX, int fromY,int toX,int toY){
+        Move move = new NormalMove(new Position(fromX,fromY),new Position(toX,toY));
+        move.execute(this);
+        System.out.println(this.toString());
+        return true;
     }
 
     public boolean validateMove(MoveRequest request){
@@ -68,12 +77,16 @@ public class Chessboard {
 //        this.squares =squares;
 //    }
 
-    private Piece getPieceAtPosition(String position) {
-        String[] coordinates = position.split("_");
-        int x = Integer.parseInt(coordinates[1]);
-        int y = Integer.parseInt(coordinates[2]);
+    public Piece getPieceAtPosition(Position pos) {
+        if(this.isEmpty(pos)){
+            throw new NullPointerException();
+        }
+        else
+            return this.squares[pos.getX()][pos.getY()];
+    }
 
-        return squares[y][x].getPiece();
+    public boolean isEmpty(Position pos){
+        return (squares[pos.getX()][pos.getY()] == null);
     }
 
     private void setPieces(Piece[][] squares){
@@ -96,8 +109,14 @@ public class Chessboard {
                 squares[i][j] = new Pawn(Colour.WHITE,PieceType.PAWN);
             }
         }
-
-
+        squares[7][0] = new Rook(Colour.WHITE,PieceType.ROOK);
+        squares[7][7] = new Rook(Colour.WHITE,PieceType.ROOK);
+        squares[7][1] = new Knight(Colour.WHITE,PieceType.KNIGHT);
+        squares[7][6] = new Knight(Colour.WHITE,PieceType.KNIGHT);
+        squares[7][2] = new Bishop(Colour.WHITE,PieceType.BISHOP);
+        squares[7][5] = new Bishop(Colour.WHITE,PieceType.BISHOP);
+        squares[7][3] = new Queen(Colour.WHITE,PieceType.QUEEN);
+        squares[7][4] = new King(Colour.WHITE,PieceType.KING);
     }
 
     public boolean isInside(Position pos){

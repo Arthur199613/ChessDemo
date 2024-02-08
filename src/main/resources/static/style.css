@@ -2,14 +2,12 @@
     background-color: white;
     height: 4rem;
     width: 4rem;
-
 }
 
 .brown {
     background-color: saddlebrown;
     height: 4rem;
     width: 4rem;
-
 }
 .chessboard td img{
     width: 50%;
@@ -29,6 +27,14 @@ html, body {margin: 2rem; height: 90%; overflow: hidden}
 .chessboard td {
     text-align: center;
     vertical-align: middle;
+}
+
+.highlighted-source{
+    background-color: yellow;
+}
+
+.highlighted-destination {
+    background-color: green; /* Choose your highlighting color for destination square */
 }
 
 

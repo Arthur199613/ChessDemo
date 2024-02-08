@@ -17,7 +17,7 @@
                 <!-- Use appropriate Thymeleaf expressions to generate the piece image source, alt text, etc. -->
 
                 <img class="draggable" draggable="true"
-                     th:src="@{../static/ChessPieces/pawn-w.svg}" th:alt="null"
+                     th:src="@{${@chessPieceUtil.getImagePath((game.getSquares()[rowIdx.index][colIdx.index]))}}"
                      th:id="'piece_'+${rowIdx.index}+'_'+${colIdx.index}"
                      th:data-piece-type="${game.getSquares()[rowIdx.index][colIdx.index].getPieceType()}"
                      th:data-piece-colour="${game.getSquares()[rowIdx.index][colIdx.index].getColour().toString()}">
@@ -39,96 +39,124 @@
 </table>
 </body>
 <script th:inline="javascript">
+    let selectedPiece;
+    console.log("Script Loaded")
     document.addEventListener('DOMContentLoaded', function () {
-        // Add drag-and-drop functionality only to img elements with class 'draggable'
-        const draggableImages = document.querySelectorAll('.draggable');
-        draggableImages.forEach(img => {
-            img.addEventListener('dragstart', handleDragStart);
-            img.addEventListener('dragend', handleDragEnd);
+        // Function to fetch and highlight legal moves for a piece
+
+        const chessPieces = document.querySelectorAll('.chess-piece img');
+        chessPieces.forEach(piece => {
+            piece.addEventListener('click', handlePieceClick);
         });
 
-        // Add drop zones for chessboard squares
-        const chessboardSquares = document.querySelectorAll('.chessboard-square');
-        chessboardSquares.forEach(square => {
-            square.addEventListener('dragover', handleDragOver);
-            square.addEventListener('drop', handleDrop);
-        });
+        function resetSelection() {
+            if (selectedPiece){
+                selectedPiece.classList.remove('selected-piece')
+                selectedPiece = null;
+            }
+            document.querySelectorAll('.highlighted-destination').forEach(square => {
+                square.classList.remove('highlighted-destination');
+                square.removeEventListener('click', handleDestinationClick);
+            });
+        }
+       function fetchLegalMoves(x, y)
+        {
+            fetch(`/legalMoves/${x}/${y}`)
+                .then(response => response.json())
+                .then(normalMoves => {
+                    resetSelection(); // Reset selectedPiece when fetching legal moves
 
-        function handleDragStart(event) {
-            event.dataTransfer.setData('text/plain', event.target.id);
-            console.log(event.target.id);
+                    // Clear previous highlights
+                   /* document.querySelectorAll('.highlighted-destination').forEach(square => {
+                        square.classList.remove('highlighted-destination');
+                        square.removeEventListener('click',handleDestinationClick);
+                    });*/
+
+
+                    // Highlight valid destination squares
+                    normalMoves.forEach(move => {
+                        const { toPos } = move;
+                        // Extract toPos from each move object
+                        //returns the div element of the piece.
+                        const destinationSquare = document.getElementById(`square_${toPos.x}_${toPos.y}`);
+                        if (destinationSquare) {
+                            destinationSquare.classList.add('highlighted-destination');
+                        }
+                        //Extract the fromPos
+                        const {fromPos} = move;
+                        selectedPiece = document.getElementById("piece_"+fromPos.x+"_"+fromPos.y)
+
+
+                        //TODO do something if no destination is returned.
+                        //Get selected piece with the fromPos coordinates
+                        //selectedPiece = document.getElementById("piece_"+fromPos.x+"_"+fromPos.y)
+                        console.log(selectedPiece);
+                        const highlightedSquares = document.querySelectorAll('.highlighted-destination'); // Example with class
+
+                        //Add an event listener to handleDestinationCLick
+                        highlightedSquares.forEach(square => {
+                            square.addEventListener('click', handleDestinationClick); // Click event
+                        });
+                    });
+                })
+                .catch(error => {
+                    console.log('Error fetching legal moves', error);
+                });
         }
 
-        function handleDragOver(event) {
-            event.preventDefault();
-        }
-
-        function handleDrop(event) {
-            event.preventDefault();
-            const pieceId = event.dataTransfer.getData('text/plain');
-            const fromSquare = event.dataTransfer.getData('text/plain') === 'piece_' + event.target.id ? event.target : document.getElementById(pieceId);
-            const toSquare = event.target.closest('td'); // Find the closest parent 'td' element
-
-            const draggedPiece = document.getElementById(pieceId).querySelector('img'); // Get the img element
-
-            const pieceType = draggedPiece.getAttribute('data-piece-type');
-            const pieceColor = draggedPiece.getAttribute('data-piece-colour');
-
-            const [toRow, toCol] = toSquare.id.split('_').slice(1);
-
-            console.log('Piece ID:', pieceId);
-            console.log('Dragged Piece:', toSquare.id);
-            console.log('Piece Type:', pieceType);
-            console.log('Piece Color:', pieceColor);
-            console.log(`Dropped at row ${toRow}, column ${toCol}`);
-
-
-            console.log(`The piece is a ${pieceType} and is  ${pieceColor} and it is at ${pieceId} going to
-            ${toSquare.id}`);
-            makeMoveRequest(pieceId,toSquare.id,pieceType,pieceColor)
-
-            // Ensure the drop target is a valid chessboard square
-            if (toSquare.classList.contains('chessboard-square')) {
-                // Move the piece to the new square
-                toSquare.appendChild(fromSquare);
-            } else {
-                // Handle the case when the drop target is not a valid square
-                console.error('Invalid drop target:', toSquare);
+        // Click event listener for chess pieces
+        function handlePieceClick(event) {
+            const piece = event.target.closest('div');
+            if (piece) {
+                const coordinates = piece.id.split('_').slice(1);
+                const fromRow = coordinates[0];
+                const fromCol = coordinates[1];
+                console.log(`Piece that was clicked on ${fromRow} ${fromCol}`)
+                resetSelection();
+                fetchLegalMoves(fromRow, fromCol);
             }
         }
 
-        function makeMoveRequest(fromSquare,toSquare,pieceType,pieceColour){
-
-            //const fromCoordinates = fromSquare.id.replace('piece_', ''); // Extracting coordinates from the fromSquare id
-            //const toCoordinates = toSquare.id.replace('square_', ''); // Extracting coordinates from the toSquare id
-            fetch('/makeMove',{
-                method:'POST',
-                headers:{
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    fromSquare: fromSquare,
-                    toSquare: toSquare,
-                    pieceType:pieceType,
-                    pieceColor:pieceColour,
-                }),
-            })
-                .then(response => response.json())
-                .then(isValidMove =>{
-                    if(isValidMove){
-                        //update the UI
-                        console.log('Move is valid!')
-                    } else{
-                        console.log("Invalid Move!")
-                    }
-                })
-                .catch(error => {
-                    console.log("Error making move",error);
-                })
+        function extractXY(coordinates){
+            const x = coordinates[0];
+            const y = coordinates[1];
+            return [x,y];
         }
 
-        function handleDragEnd(event) {
-            // Additional logic after dragging ends (if needed)
+        // Click event listener for highlighted destination squares
+        function handleDestinationClick(event) {
+            const destinationSquare = event.target.closest('td');
+            if (destinationSquare) {
+                const coordinatesTo = destinationSquare.id.split('_').slice(1);
+                const toXY = extractXY(coordinatesTo);
+
+                const coordinatesFrom = selectedPiece.id.split('_').slice(1);
+                const fromXY = extractXY(coordinatesFrom);
+
+                //TODO Use variables x and y for better readability
+                moveRequestToServer(fromXY[0],fromXY[1],toXY[0], toXY[1])
+                console.log(`Moving piece to row ${toXY[0]}, column ${toXY[1]}`);
+                destinationSquare.append(selectedPiece);
+                selectedPiece.id = `piece_${toXY[0]}_${toXY[1]}`;
+                resetSelection();
+
+                // You can now send a request to the server to make the move
+                // and handle the response accordingly
+            }
+        }
+        function moveRequestToServer(fromX, fromY, toX, toY) {
+            fetch(`/makeMove/${fromX}/${fromY}/${toX}/${toY}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => response.json())
+                .then(response => {
+                    if (response) {
+                        console.log("Move Updated");
+                    }
+                });
         }
     });
 </script>

@@ -15,6 +15,15 @@ public abstract class Piece {
     String svgPath;
     PieceType type;
 
+    boolean hasMoved;
+
+    public boolean isHasMoved() {
+        return hasMoved;
+    }
+
+    public void setHasMoved(boolean hasMoved) {
+        this.hasMoved = hasMoved;
+    }
 
     public String getColour() {
         return colour.toString();
@@ -26,36 +35,38 @@ public abstract class Piece {
 
    public abstract String getPieceType();
 
-    public abstract Boolean isValidMove(Chessboard chessboard, int toX, int toY, int fromX, int fromY);
+        public abstract Boolean isValidMove(Chessboard chessboard, int toX, int toY, int fromX, int fromY);
 
-    //public abstract Iterable<Move> GetMoves(Position from, Position to);
+        public abstract Iterable<Move> getMoves(Position from, Chessboard chessboard);
+        //public abstract Iterable<Move> GetMoves(Position from, Position to);
 
-    //GetAllThePossibleMovePositions, this should include the piece in the way
-    public Iterable<Position> MovePositionsInDir(Position from, Chessboard chessboard, Direction dir) {
-        List<Position> positionList = new ArrayList<>();
+        //GetAllThePossibleMovePositions, this should include the piece in the way
+        public Iterable<Position> MovePositionsInDir(Position from, Chessboard chessboard, Direction dir) {
+            List<Position> positionList = new ArrayList<>();
 
-        for (Position pos = Position.add(from, dir); chessboard.isInside(pos); pos = Position.add(pos, dir)) {
-            if (chessboard.squares[pos.getX()][pos.getY()] == null) {
-                positionList.add(pos);
-            } else {
-                Piece pieceAtPosition = chessboard.squares[pos.getX()][pos.getY()];
-                if (!pieceAtPosition.getColour().equals(this.colour.toString())) {
+            for (Position pos = Position.add(from, dir); chessboard.isInside(pos); pos = Position.add(pos, dir)) {
+                if (chessboard.getSquares()[pos.getX()][pos.getY()] == null) {
                     positionList.add(pos);
+                } else {
+                    Piece pieceAtPosition = chessboard.getSquares()[pos.getX()][pos.getY()];
+                    if (!pieceAtPosition.getColour().equals(this.colour.toString())) {
+                        positionList.add(pos);
+                    }
+                    break;
                 }
-                break;
             }
+            return positionList;
         }
-        return positionList;
-    }
 
-    public Iterable<Position> MovePositionsInDirs(Position from, Chessboard chessboard, Direction[] dirs) {
-        List<Position> listOfAllPositions = new ArrayList<>();
-        for (Direction dir : dirs) {
-            // Convert Iterable to Collection
-            Collection<Position> positionsInDir = (Collection<Position>) MovePositionsInDir(from, chessboard, dir);
-            listOfAllPositions.addAll(positionsInDir);
+        public Iterable<Position> MovePositionsInDirs(Position from, Chessboard chessboard, Direction[] dirs) {
+            List<Position> listOfAllPositions = new ArrayList<>();
+            for (Direction dir : dirs) {
+                // Convert Iterable to Collection
+                Collection<Position> positionsInDir = (Collection<Position>) MovePositionsInDir(from, chessboard, dir);
+                listOfAllPositions.addAll(positionsInDir);
+            }
+            return listOfAllPositions;
         }
-        return listOfAllPositions;
-    }
+
 }
 
