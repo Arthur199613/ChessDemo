@@ -18,9 +18,9 @@
 
                 <img class="draggable" draggable="true"
                      th:src="@{${@chessPieceUtil.getImagePath((game.getSquares()[rowIdx.index][colIdx.index]))}}"
-                     th:id="'piece_'+${rowIdx.index}+'_'+${colIdx.index}"
                      th:data-piece-type="${game.getSquares()[rowIdx.index][colIdx.index].getPieceType()}"
                      th:data-piece-colour="${game.getSquares()[rowIdx.index][colIdx.index].getColour().toString()}">
+
             </div>
         </td>
     </tr>
