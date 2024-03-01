@@ -85,6 +85,8 @@ public class Chessboard {
             return this.squares[pos.getX()][pos.getY()];
     }
 
+    /**The given square is empty (Doesn't have a piece)
+     * Returns true if square is null**/
     public boolean isEmpty(Position pos){
         return (squares[pos.getX()][pos.getY()] == null);
     }

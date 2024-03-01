@@ -26,6 +26,7 @@ public class NormalMove extends Move{
         chessboard.getSquares()[toPos.getX()][toPos.getY()] = piece;
         chessboard.getSquares()[fromPos.getX()][fromPos.getY()] = null;
         System.out.println("Move has been executed");
+        piece.setHasMoved(true);
         //Additional piece.HasMoved property set to true.
     }
 

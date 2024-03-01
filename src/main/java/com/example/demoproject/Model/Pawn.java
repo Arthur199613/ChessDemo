@@ -84,8 +84,10 @@ public class Pawn extends Piece{
        return chessboard.getSquares()[pos.getX()][pos.getY()].colour != this.colour;
     }
 
+    //Checks if inside board and the tile is null
     private static boolean canMoveTo(Position pos, Chessboard chessboard){
-       return chessboard.isInside(pos) && chessboard.getSquares()[pos.getX()][pos.getY()] == null;
+       System.out.println(pos.getX() + " " + pos.getY() + " " + chessboard.isEmpty(pos));
+       return chessboard.isInside(pos) && chessboard.isEmpty(pos);
     }
 
     private Iterable<Move> forwardMoves(Position from, Chessboard chessboard) {
@@ -94,10 +96,14 @@ public class Pawn extends Piece{
 
         //Check the colour of the pawn...
         List<Move> moves = new ArrayList<>();
-        if (canMoveTo(oneMovePos, chessboard) && !hasMoved) {
-            moves.add(new NormalMove(from, twoMovePos));
+        if (canMoveTo(oneMovePos, chessboard)){
+            moves.add(new NormalMove(from, oneMovePos));
+
+            if(!hasMoved && canMoveTo(twoMovePos,chessboard)){
+                moves.add(new NormalMove(from,twoMovePos));
+                hasMoved = true;
+            }
         }
-        moves.add(new NormalMove(from, oneMovePos));
         return moves;
     }
 
@@ -108,7 +114,7 @@ public class Pawn extends Piece{
              ) {
             Position to = Position.add(Position.add(from,forward),dir);
 
-            if (canMoveTo(to,chessboard)){
+            if(canCaptureAt(to,chessboard)){
                 moveList.add(new NormalMove(from,to));
             }
         }
