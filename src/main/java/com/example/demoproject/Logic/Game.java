@@ -6,10 +6,12 @@ import com.example.demoproject.Model.*;
 
 public class Game {
     Chessboard chessboard;
+    Player currentPlayer;
 
     public Game() {
         //initialises pieces also
         chessboard = new Chessboard();
+        currentPlayer = Player.White;
     }
     private void setSquareColourAndChessboard(Piece[][] squares) {
     }
@@ -19,5 +21,13 @@ public class Game {
 
     public Chessboard getChessboard() {
         return this.chessboard;
+    }
+
+    public Player getPlayer(){
+        return currentPlayer;
+    }
+
+    public void switchPlayer(){
+         currentPlayer = currentPlayer==Player.White ? Player.Black : Player.White;
     }
 }

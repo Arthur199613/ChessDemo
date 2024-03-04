@@ -68,5 +68,6 @@ public abstract class Piece {
             return listOfAllPositions;
         }
 
+
 }
 

@@ -13,7 +13,8 @@
         <td th:each="square, colIdx : ${row}" th:class="${(rowIdx.index + colIdx.index) % 2 == 0 ? 'chessboard-square brown' : 'chessboard-square white'} "
             th:id="'square_'+${rowIdx.index}+'_'+${colIdx.index}">
 
-            <div th:if="${game.getSquares()[rowIdx.index][colIdx.index] != null}" class="chess-piece" th:id="'piece_'+${rowIdx.index}+'_'+${colIdx.index}">
+            <div th:if="${game.getSquares()[rowIdx.index][colIdx.index] != null}"
+                 class="chess-piece" th:id="'piece_'+${rowIdx.index}+'_'+${colIdx.index}">
                 <!-- Use appropriate Thymeleaf expressions to generate the piece image source, alt text, etc. -->
 
                 <img class="draggable" draggable="true"
@@ -40,14 +41,20 @@
 </body>
 <script th:inline="javascript">
     let selectedPiece;
+    let player;
     console.log("Script Loaded")
     document.addEventListener('DOMContentLoaded', function () {
         // Function to fetch and highlight legal moves for a piece
 
         const chessPieces = document.querySelectorAll('.chess-piece img');
-        chessPieces.forEach(piece => {
-            piece.addEventListener('click', handlePieceClick);
-        });
+        //We fetch the current player)
+        fetchCurrentPlayer();
+        addEventListenerToPieces();
+        function addEventListenerToPieces(){
+            chessPieces.forEach(piece => {
+                piece.addEventListener('click', handlePieceClick);
+            });
+        }
 
         function resetSelection() {
             if (selectedPiece){
@@ -59,6 +66,17 @@
                 square.removeEventListener('click', handleDestinationClick);
             });
         }
+
+       function fetchCurrentPlayer() {
+            return fetch(`/currentPlayer`)
+                .then(response => response.json())
+                .then(playerReturn => {
+                    player = playerReturn;
+                    return player;
+                })
+                .catch(error => console.log("Error fetching player" + error));
+        }
+
        function fetchLegalMoves(x, y)
         {
             fetch(`/legalMoves/${x}/${y}`)
@@ -71,7 +89,6 @@
                         square.classList.remove('highlighted-destination');
                         square.removeEventListener('click',handleDestinationClick);
                     });*/
-
 
                     // Highlight valid destination squares
                     normalMoves.forEach(move => {
@@ -107,13 +124,22 @@
         // Click event listener for chess pieces
         function handlePieceClick(event) {
             const piece = event.target.closest('div');
+            const pieceImgElement = piece.querySelector('img');
+            const pieceColour = pieceImgElement.getAttribute('data-piece-colour');
+
+
             if (piece) {
-                const coordinates = piece.id.split('_').slice(1);
-                const fromRow = coordinates[0];
-                const fromCol = coordinates[1];
-                console.log(`Piece that was clicked on ${fromRow} ${fromCol}`)
-                resetSelection();
-                fetchLegalMoves(fromRow, fromCol);
+                if(pieceColour === player.toString().toUpperCase()) {
+                    const coordinates = piece.id.split('_').slice(1);
+                    const fromRow = coordinates[0];
+                    const fromCol = coordinates[1];
+                    console.log(`Piece that was clicked on ${fromRow} ${fromCol}`)
+                    resetSelection();
+                    fetchLegalMoves(fromRow, fromCol);
+                }
+                else{
+                    console.log(`The player turn is ${player} so it is not your turn`)
+                }
             }
         }
 
@@ -154,7 +180,8 @@
                 .then(response => response.json())
                 .then(response => {
                     if (response) {
-                        console.log("Move Updated");
+                        console.log("Move Updated")
+                        fetchCurrentPlayer();
                     }
                 });
         }

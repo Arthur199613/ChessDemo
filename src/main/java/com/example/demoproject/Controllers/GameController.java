@@ -4,6 +4,7 @@ import com.example.demoproject.DTO.MoveRequest;
 import com.example.demoproject.Logic.Game;
 import com.example.demoproject.Model.Move.Move;
 import com.example.demoproject.Model.Move.NormalMove;
+import com.example.demoproject.Model.Player;
 import com.example.demoproject.Service.GameService;
 import com.example.demoproject.Util.Position;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,11 @@ public class GameController {
         return ResponseEntity.ok(legalMoves);
     }
 
+    @GetMapping("/currentPlayer")
+    public ResponseEntity<Player> getPlayerTurn(){
+        return ResponseEntity.ok(gameService.getCurrentTurn());
+    }
+
     @RequestMapping("/game")
     public String showGame(Model model) {
         // Get the game data (board state, etc.) and add it to the model
@@ -49,6 +55,7 @@ public class GameController {
         if (isValidMove) {
             // Update the game state if the move is valid
             // You can also return additional information if needed
+            gameService.switchPlayer();
             return ResponseEntity.ok(true);
         } else {
             // Return a response indicating the move is invalid

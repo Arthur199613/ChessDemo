@@ -4,6 +4,7 @@ import com.example.demoproject.DTO.MoveRequest;
 import com.example.demoproject.Logic.Game;
 import com.example.demoproject.Model.Move.Move;
 import com.example.demoproject.Model.Piece;
+import com.example.demoproject.Model.Player;
 import com.example.demoproject.Util.Position;
 import org.springframework.stereotype.Service;
 
@@ -35,5 +36,13 @@ public class GameService {
 
     public boolean makeMove(int fromX, int fromY,int toX, int toY){
         return game.makeMove(fromX,fromY,toX,toY);
+    }
+
+    public Player getCurrentTurn(){
+        return game.getPlayer();
+    }
+
+    public void switchPlayer(){
+         game.switchPlayer();
     }
 }
