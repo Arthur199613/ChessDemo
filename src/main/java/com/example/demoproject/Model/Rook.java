@@ -42,4 +42,11 @@ public class Rook extends Piece{
         }
         return moves;
     }
+
+    @Override
+    Piece copy() {
+        Rook copy = new Rook(colour,type);
+        copy.hasMoved = hasMoved;
+        return copy;
+    }
 }

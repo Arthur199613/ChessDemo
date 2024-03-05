@@ -6,11 +6,14 @@ import com.example.demoproject.Model.Move.NormalMove;
 import com.example.demoproject.Util.Position;
 import org.springframework.data.util.Pair;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class Chessboard {
     //Square[][] squares;
     private Piece[][] squares;
+
 
 
     public Chessboard(){
@@ -124,6 +127,57 @@ public class Chessboard {
     public boolean isInside(Position pos){
         return pos.getX() < squares.length && pos.getY() < squares.length &&
                 pos.getX() >= 0 && pos.getY() >= 0;
+    }
+
+    public Iterable<Position> piecePositions()
+    {
+        List<Position> positions = new ArrayList<>();
+        int width = squares.length;
+        for(int r =0; r < width; r++ ){
+            for (int c = 0; c < width; c++){
+                Position pos = new Position(c,r);
+                if (!isEmpty(pos)){
+                    positions.add(pos);
+                }
+            }
+        }
+        return positions;
+    }
+
+    public Iterable<Position> piecePositionsForPlayer(Player player)
+    {
+        List<Position> positions = new ArrayList<>();
+
+        for (Position pos : piecePositions())
+        {
+            if(player.toString().toUpperCase().equals(getPieceAtPosition(pos).colour.toString())){
+                positions.add(pos);
+            }
+        }
+        return positions;
+    }
+
+    public boolean isInCheck(Player player){
+        List<Position> positions = (List<Position>) piecePositionsForPlayer(Player.opponent(player));
+        for(Position pos : positions){
+            Piece piece = this.getPieceAtPosition(pos);
+            if(piece!=null && piece.canCaptureOpponentKing(pos,this))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Chessboard copy()
+    {
+        Chessboard copy = new Chessboard();
+
+        for (Position pos: piecePositions()
+             ) {
+           copy.squares[pos.getX()][pos.getY()] = this.getPieceAtPosition(pos).copy();
+        }
+        return copy;
     }
 
     public Piece[][] getSquares() {

@@ -42,4 +42,11 @@ public class Bishop extends Piece{
 
         return moves;
     }
+
+    @Override
+    Piece copy() {
+        Bishop copy = new Bishop(colour,type);
+        copy.hasMoved = hasMoved;
+        return copy;
+    }
 }

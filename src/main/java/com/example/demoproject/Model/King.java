@@ -19,7 +19,11 @@ public class King extends Piece {
             Direction.North,
             Direction.East,
             Direction.West,
-            Direction.South
+            Direction.South,
+            Direction.NorthEast,
+            Direction.NorthWest,
+            Direction.SouthWest,
+            Direction.SouthEast
     };
     @Override
     public String getPieceType() {
@@ -56,5 +60,25 @@ public class King extends Piece {
             moves.add(new NormalMove(from,to));
         }
         return moves;
+    }
+    //TODO Handling nulls inside the if statements
+    @Override
+    public boolean canCaptureOpponentKing(Position from, Chessboard chessboard){
+        for (Position position : movePositions(from, chessboard)) {
+            Piece piece = chessboard.getSquares()[position.getX()][position.getY()];
+
+            if (piece != null && piece.getPieceType().equals(PieceType.KING.toString())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //Copy must be a completely new instance
+    @Override
+    Piece copy() {
+        King copy = new King(colour,type);
+        copy.hasMoved = hasMoved;
+        return copy;
     }
 }

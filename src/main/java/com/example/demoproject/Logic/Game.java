@@ -27,7 +27,10 @@ public class Game {
         return currentPlayer;
     }
 
+    /**
+     * If the current player is null then this will return an error.
+     * **/
     public void switchPlayer(){
-         currentPlayer = currentPlayer==Player.White ? Player.Black : Player.White;
+        currentPlayer= Player.opponent(currentPlayer);
     }
 }

@@ -9,6 +9,7 @@ import com.example.demoproject.Util.Position;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,8 +25,13 @@ public class GameService {
     }
 
     public List<Move> getLegalMoves(Position from) {
+        if(game.getChessboard().isEmpty(from) || !game.getChessboard().getPieceAtPosition(from).getColour().equals(game.getPlayer().toString().toUpperCase())){
+            return Collections.emptyList();
+        }
         Piece piece = game.getChessboard().getPieceAtPosition(from);
-        return piece != null ? toList(piece.getMoves(from, game.getChessboard())) : Collections.emptyList();
+        List<Move> moveCandidates = (List<Move>) piece.getMoves(from,game.getChessboard());
+        return moveCandidates.stream().filter(move -> move.isLegal(game.getChessboard())).toList();
+        //return piece != null ? toList(piece.getMoves(from, game.getChessboard())) : Collections.emptyList();
     }
 
     private List<Move> toList(Iterable<Move> iterable) {

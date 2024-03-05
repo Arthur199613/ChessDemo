@@ -19,6 +19,16 @@ public class NormalMove extends Move{
         return MoveType.Normal;
     }
 
+    @Override
+    public Position fromPos() {
+        return this.fromPos;
+    }
+
+    @Override
+    public Position toPos() {
+        return this.toPos;
+    }
+
     @JsonIgnore
     @Override
     public void execute(Chessboard chessboard) {

@@ -44,4 +44,11 @@ public class Queen extends Piece{
         }
         return moves;
     }
+
+    @Override
+    Piece copy() {
+        Queen copy = new Queen(colour,type);
+        copy.hasMoved = hasMoved;
+        return copy;
+    }
 }

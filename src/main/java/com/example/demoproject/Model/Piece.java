@@ -68,6 +68,20 @@ public abstract class Piece {
             return listOfAllPositions;
         }
 
+        public boolean canCaptureOpponentKing(Position from, Chessboard chessboard) {
+            System.out.println("In can capture opponent king class");
+            //List<Move> capturingMoves = new ArrayList<>();
+            for (Move move : getMoves(from, chessboard)) {
+                Piece piece = chessboard.getSquares()[move.toPos().getX()][move.toPos().getY()];
+                //System.out.printf("%s %s", move.fromPos(), move.toPos());
+                if (piece != null && piece.getPieceType().equals(PieceType.KING.toString())) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+    abstract Piece copy();
 
 }
 

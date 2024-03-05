@@ -61,4 +61,11 @@ public class Knight extends Piece{
         }
         return positions;
     }
+
+    @Override
+    Piece copy() {
+        Knight copy = new Knight(colour,type);
+        copy.hasMoved = hasMoved;
+        return copy;
+    }
 }

@@ -135,7 +135,25 @@ public class Pawn extends Piece{
         // Assuming forwardMoves and diagonalMoves return List<Move>
         moves.addAll((Collection<? extends Move>) forwardMoves(from, chessboard));
         moves.addAll((Collection<? extends Move>) diagonalMoves(from, chessboard));
-
         return moves;
     }
+
+    @Override
+    public boolean canCaptureOpponentKing(Position from, Chessboard chessboard){
+        for (Move move: diagonalMoves(from,chessboard)
+             ) {
+            Piece piece = chessboard.getPieceAtPosition(move.toPos());
+            if(piece != null && piece.getPieceType().equals(PieceType.KING.toString())){
+              return true;
+            }
+        }
+        return false;
+    }
+    @Override
+    Piece copy() {
+        Pawn copy = new Pawn(colour,type);
+        copy.hasMoved = hasMoved;
+        return copy;
+    }
+
 }
